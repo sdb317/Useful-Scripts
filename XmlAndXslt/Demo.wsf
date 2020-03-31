@@ -1,0 +1,42 @@
+﻿<package>
+    <!--%SystemRoot%\SysWOW64\cscript //nologo Demo.wsf //job:<Job>-->
+
+    <job id='Demo'>
+        <script language='javascript'>
+
+            try
+                {
+                var TransformDocument=new ActiveXObject('Msxml2.FreeThreadedDOMDocument');
+                TransformDocument.async=false;
+                var XSLT=WScript.ScriptFullName.substr(0,WScript.ScriptFullName.lastIndexOf('.'))+'.xslt';
+                WScript.Echo('Loading: '+XSLT);
+                if (TransformDocument.load(XSLT))
+                    {
+                    var Transform=new ActiveXObject('Msxml2.XSLTemplate');
+                    Transform.stylesheet=TransformDocument;
+                    var Document=new ActiveXObject('Msxml2.DOMDocument');
+                    Document.async=false;
+                    var XML=WScript.ScriptFullName.substr(0,WScript.ScriptFullName.lastIndexOf('.'))+'.xml';
+                    WScript.Echo('Loading: '+XML);
+                    if (Document.load(XML))
+                        {
+                        var Processor;
+                        Processor=Transform.createProcessor();
+                        Processor.input=Document;
+                        Processor.addParameter('Message','Hello world!');
+                        if (Processor.transform())
+                            {
+					        WScript.Echo(Processor.output);
+                            }
+                        }
+                    }
+                }
+            catch (e)
+                {
+                WScript.Echo('main: '+e.description);
+                }
+
+        </script>
+    </job>
+
+</package>
