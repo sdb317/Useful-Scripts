@@ -1,45 +1,39 @@
-<package><!--%SystemRoot%\SysWOW64\cscript //nologo Demo.wsf //job:<Job>-->
+<package>
+    <!--%SystemRoot%\SysWOW64\cscript //nologo Demo.wsf //job:<Job>-->
 
-<!--
-Automating the table row 'click' event seems to be impossible, probably because the scripted event has 'trusted: false' whereas the real one has 'trusted: true'
--->
+    <job id='Demo'>
+        <!-- Demo "hello world!" -->
+        <script language='javascript' src='File.js' />
+        <script language='javascript' src='IE.js' />
+        <script language='javascript'>
 
-  <job id='Demo'><!-- Demo "hello world!" -->
-    <script language='javascript' src='File.js'/>
-    <script language='javascript' src='IE.js'/>
-    <script language='javascript'>
-
-        var IE=null;
-        try
-            {
-            //debugger;
-            var myText=WScript.Arguments(0);
-            var shell=new ActiveXObject('WScript.Shell');
-            //var document=new ActiveXObject('InternetExplorer.Application');
-            //document.visible=true;
-            IE=FindIE('file:///C:/Dev/Projects/Useful-Scripts/InternetExplorerAutomation/Demo.html'); // Enter your URL from IE here
-            if (IE) // A WebBrowser2 interface :-)
+            var IE = null;
+            try {
+                //debugger;
+                var myText = WScript.Arguments(0);
+                var shell = new ActiveXObject('WScript.Shell');
+                //var document =n ew ActiveXObject('InternetExplorer.Application');
+                //document.visible = true;
+                IE = FindIE('file:///C:/Dev/Projects/Useful-Scripts/InternetExplorerAutomation/Demo.html'); // Enter your URL from IE here
+                if (IE) // A WebBrowser2 interface :-)
                 {
-                var document=IE.Document;
-                var div=FindElement(document,document.body,function(node) {return node.tagName.toLowerCase()==='div'&&node.id==='myText';});
-                if (div)
-                    {
-                    div.innerText=myText;
+                    var document = IE.Document;
+                    var div = FindElement(document, document.body, function (node) { return node.tagName.toLowerCase() === 'div' && node.id === 'myText'; });
+                    if (div) {
+                        div.innerText = myText;
                     }
                 }
-            else
-                {
-                WScript.Echo('Document could not be found in the ROT');
+                else {
+                    WScript.Echo('Document could not be found in the ROT');
                 }
             }
-        catch (e)
-            {
-            WScript.Echo('Failed: '+e.name);
+            catch (e) {
+                WScript.Echo('Failed: ' + e.name);
             }
-        IE=null;
-        CollectGarbage();
+            IE = null;
+            CollectGarbage();
 
-    </script>
-  </job>
+        </script>
+    </job>
 
-  </package>
+</package>
