@@ -10,7 +10,7 @@
 
             try
                 {
-	            var WShell=WScript.CreateObject('WScript.Shell');
+                var WShell=WScript.CreateObject('WScript.Shell');
                 var Application=null;
                 try
                     {
@@ -28,12 +28,12 @@
                         var Inbox=Namespace.getDefaultFolder(olFolderInbox);
                         if (Inbox!=null)
                             {
-				            var Item=Application.CreateItem(olMailItem);
-				            if (Item!=null)
-					            {
-					            Item.To='someone@somewhere.com';
-					            Item.CC='';
-					            Item.Subject='Something';
+                            var Item=Application.CreateItem(olMailItem);
+                            if (Item!=null)
+                                {
+                                Item.To='someone@somewhere.com';
+                                Item.CC='';
+                                Item.Subject='Something';
                                 var HTMLBody='';
                                 HTMLBody+=
                                     ' \
@@ -66,7 +66,7 @@
                                             li \
                                                 { \
                                                 padding-bottom:8px; \
-			                                    } \
+                                                } \
                                         </style> \
                                     </head> \
                                     <body> \
@@ -77,13 +77,13 @@
                                     </body> \
                                     </html> \
                                     ';
-					            Item.HTMLBody=HTMLBody;
-					            Item.Save(); // Will be in 'Drafts'
-					            // Item.Send();
+                                Item.HTMLBody=HTMLBody;
+                                Item.Save(); // Will be in 'Drafts'
+                                // Item.Send();
                                 Item.Display();
-				                WScript.Echo('Email sent');
-					            Item=null;
-					            }
+                                WScript.Echo('Email sent');
+                                Item=null;
+                                }
                             Inbox=null;
                             }
                         Namespace=null;
