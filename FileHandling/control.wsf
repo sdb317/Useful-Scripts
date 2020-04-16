@@ -1,0 +1,49 @@
+<package><!--cscript //nologo control.wsf //job:-->
+
+<!--
+-->
+
+  <job id='Checksum'><!--<Folder> <SearchString>-->
+    <script language='javascript' src='Lib.js'/>
+    <script language='javascript' src='wsf.js'/>
+    <script language='javascript' src='CFileParser.js'/>
+    <script language='javascript'>
+
+        try {
+            var Folder=WScript.Arguments(0);
+            var SearchString=WScript.Arguments(1);
+            var FileParser=new CFileParser();
+            FileParser.FileIterator
+                (
+                Folder,
+                function(FileName)
+                    {
+                    if (FileName.search(SearchString)!=-1) return true; else return false;
+                    },
+                function(FileName)
+                    {
+                    //FileParser.RecordIterator
+                    //    (
+                    //    GetCurrentFolder()+FileName,
+                    //    function(RecordText)
+                    //        {
+                    //        return true;
+                    //        },
+                    //    function(RecordText)
+                    //        {
+                    //        Log(FileName+': '+crc32(RecordText).toString(16));
+                    //        return true;
+                    //        }
+                    //    );
+                    Log(FileName+': '+crc32(ReadText(Folder+'\\'+FileName).replace(/\r/g,'').replace(/\n/g,'').replace(/\s/g,'')).toString(16));
+                    }
+                );
+
+        } catch (e) {
+            Log('Failed: '+e.name);
+        }
+
+    </script>
+  </job>
+
+  </package>
