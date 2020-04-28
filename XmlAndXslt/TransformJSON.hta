@@ -1,0 +1,109 @@
+﻿<html><!--mshta <Path>\TransformJSONfile.hta <JSONfile>-->
+<head>
+    <meta http-equiv='X-UA-Compatible' content='IE=9' />
+    <meta http-equiv='Content-type' content='text/html; charset=utf-8' />
+    <title>TransformJSONfile</title>
+    <hta:application
+        id='hta'
+        applicationname='TransformJSONfile'
+        borderstyle='normal'
+        caption='yes'
+        icon=''
+        maximizebutton='yes'
+        minimizebutton='yes'
+        showintaskbar='yes'
+        singleinstance='no'
+        sysmenu='yes'
+        version='1.0' />
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: Tahoma;
+            font-size: 10pt;
+            vertical-align: top;
+        }
+
+        div {
+            padding: 8px;
+        }
+
+        textarea {
+            font-family: Tahoma;
+            font-size: 10pt;
+            width: auto;
+            height: auto;
+            padding: 8px;
+        }
+
+        div input {
+            margin: 8px;
+        }
+    </style>
+    <script src='https://cdn.bootcss.com/defiant.js/1.4.2/defiant.min.js' type='text/javascript'></script>
+    <script type="defiant/xsl-template">
+    </script>
+    <script>
+        var FileSystem = new ActiveXObject('Scripting.FileSystemObject');
+        var JSONfile;
+        var XSLTfile;
+
+        function onload() {
+            try {
+                debugger;
+                var Stream;
+                var Body;
+                JSONfile = hta.commandLine.split(' ')[1];
+                Stream = FileSystem.OpenTextFile(JSONfile, 1);
+                Body = Stream.ReadAll();
+                Stream.Close();
+                document.getElementById('JSONfile').value = Body;
+                XSLTfile = hta.commandLine.split(' ')[2];
+                Stream = FileSystem.OpenTextFile(XSLTfile, 1);
+                Body = Stream.ReadAll();
+                Stream.Close();
+                document.getElementById('XSLTfile').value = Body;
+            }
+            catch (e) {
+                window.alert('onload: ' + e.description);
+            }
+        }
+
+        function preview() {
+            document.scripts['1'].innerText = document.getElementById('JSONfile').value;
+            document.getElementById('content').innerHTML =
+                 Defiant.render('books_template', JSON.parse(document.getElementById('JSONfile').value));
+        }
+
+        function save() {
+            try {
+                var Stream;
+                var Body = document.getElementById('XSLTfile').value;
+                Stream = FileSystem.OpenTextFile(XSLTfile, 2);
+                Stream.Write(Body);
+                Stream.Close();
+            }
+            catch (e) {
+                window.alert('save: ' + e.description);
+            }
+        }
+    </script>
+</head>
+<body onload='onload()'>
+    <div>
+        <textarea id='JSONfile' rows="40" cols="120"></textarea>
+    </div>
+    <div>
+        <textarea id='XSLTfile' rows="40" cols="120"></textarea>
+    </div>
+    <div>
+        <span>
+            <input type='button' value='Transform' onclick='preview()' />
+        </span>
+        <span>
+            <input type='button' value='Save' onclick='save()' />
+        </span>
+    </div>
+    <div id='content'></div>
+</body>
+</html>

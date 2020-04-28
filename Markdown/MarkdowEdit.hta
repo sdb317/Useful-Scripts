@@ -1,0 +1,97 @@
+﻿<html><!--mshta <Path>\MarkdowEdit.hta <FileName>-->
+<head>
+    <meta http-equiv='X-UA-Compatible' content='IE=9' />
+    <meta http-equiv='Content-type' content='text/html; charset=utf-8' />
+    <title>MarkdowEdit</title>
+    <hta:application
+        id='hta'
+        applicationname='MarkdowEdit'
+        borderstyle='normal'
+        caption='yes'
+        icon=''
+        maximizebutton='yes'
+        minimizebutton='yes'
+        showintaskbar='yes'
+        singleinstance='no'
+        sysmenu='yes'
+        version='1.0' />
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: Tahoma;
+            font-size: 10pt;
+            vertical-align: top;
+        }
+
+        div {
+            padding: 8px;
+        }
+
+        textarea {
+            font-family: Tahoma;
+            font-size: 10pt;
+            width: auto;
+            height: auto;
+            padding: 8px;
+        }
+
+        div input {
+            margin: 8px;
+        }
+    </style>
+    <script src='https://cdn.rawgit.com/showdownjs/showdown/develop/dist/showdown.min.js' type='text/javascript'></script>
+    <script>
+        var FileSystem = new ActiveXObject('Scripting.FileSystemObject');
+        var FileName;
+
+        function onload() {
+            try {
+                showdown.setFlavor('github');
+                //showdown.setOption('tables', true);
+                FileName = hta.commandLine.split(' ')[1];
+                var Stream;
+                Stream = FileSystem.OpenTextFile(FileName, 1);
+                var Body = Stream.ReadAll();
+                Stream.Close();
+                document.getElementById('markdown').value = Body;
+            }
+            catch (e) {
+                window.alert('onload: ' + e.description);
+            }
+        }
+
+        function preview() {
+            document.getElementById('content').innerHTML =
+                (new showdown.Converter()).makeHtml(document.getElementById('markdown').value);
+        }
+
+        function save() {
+            try {
+                var Body = document.getElementById('markdown').value;
+                var Stream;
+                Stream = FileSystem.OpenTextFile(FileName, 2);
+                Stream.Write(Body);
+                Stream.Close();
+            }
+            catch (e) {
+                window.alert('save: ' + e.description);
+            }
+        }
+    </script>
+</head>
+<body onload='onload()'>
+    <div>
+        <textarea id='markdown' rows="40" cols="120"># Enter markdown here</textarea>
+    </div>
+    <div>
+        <span>
+            <input type='button' value='Preview' onclick='preview()' />
+        </span>
+        <span>
+            <input type='button' value='Save' onclick='save()' />
+        </span>
+    </div>
+    <div id='content'></div>
+</body>
+</html>
