@@ -1,0 +1,133 @@
+<package><!--cscript //nologo Scripts.wsf //job:<Job>-->
+  
+  
+  <job id='Upload'><!-- Upload <FolderName> -->
+    <script src='..\_Common\Lib.js'></script>
+    <script src='..\_Common\wsf.js'></script>
+    <script src='..\DateAndTime\Library.js'></script>
+    <script language='javascript'>
+
+        var excludeFolders=new ActiveXObject('Scripting.Dictionary');
+        var excludeTypes=new ActiveXObject('Scripting.Dictionary');
+        (
+        function Excludes()
+            {
+            try
+                {
+                excludeFolders.add('.git','');
+                excludeFolders.add('Debug',''); // VS
+                excludeFolders.add('Release',''); // VS
+                excludeFolders.add('.vs',''); // VS
+                excludeFolders.add('ipch',''); // VS
+                excludeFolders.add('x64',''); // VS
+                excludeFolders.add('.vscode',''); // VS Code
+                excludeFolders.add('.settings',''); // Java
+                excludeFolders.add('target',''); // Java
+                excludeFolders.add('node_modules',''); // NPM
+                excludeFolders.add('obj',''); // VS
+                excludeFolders.add('bin',''); // VS
+                excludeFolders.add('typings',''); // TypeScript
+                excludeFolders.add('__pycache__',''); // Python
+                excludeFolders.add('env',''); // Python
+                excludeTypes.add('bak','');
+                excludeTypes.add('log','');
+                excludeTypes.add('pyc','');
+                excludeTypes.add('scc','');
+                }
+            catch (e)
+                {
+                Log('Excludes: '+e.name+': '+e.message+', '+e.number+': '+e.description);
+                }
+            }
+        )();
+
+        var Command;
+
+        function File(file)
+            {
+            try
+                {
+                this.path=file.Path;
+                this.path=this.path.substr(0,this.path.lastIndexOf('\\'));
+                this.name=file.Name;
+                this.type=this.name.substr(this.name.lastIndexOf('.')+1).toLowerCase();
+                this.size=file.Size;
+                this.modified=Date.parse(file.DateLastModified);
+                this.modified=getDate(this.modified,'-')+' '+getTime(this.modified,':');
+                }
+            catch (e)
+                {
+                Log('FileItem: '+e.name+': '+e.message+', '+e.number+': '+e.description);
+                }
+            }
+
+        function IterateFiles(folderName)
+            {
+            try
+                {
+                Output(folderName);
+                var folder=FileSystem.GetFolder(folderName);
+                var subFolders=new Enumerator(folder.SubFolders);
+                for (;!subFolders.atEnd();subFolders.moveNext())
+                    {
+                    var subFolderName=subFolders.item().Name;
+                    if (excludeFolders.Exists(subFolderName))
+                        continue;
+                    IterateFiles(folderName+'\\'+subFolderName);
+                    }
+                var files=new Enumerator(folder.Files);
+                for (;!files.atEnd();files.moveNext())
+                    {
+                    try 
+                        {
+                        var file=new File(files.item());
+                        if (excludeTypes.Exists(file.type))
+                            continue;
+                        Output(file.name);
+                        var SQL="select addFile (0,'"+file.name.replace("'","''")+"','"+file.type+"','"+file.path+"',"+file.size.toString()+",'"+file.modified+"');";
+                        //Output(SQL);
+                        Command.CommandText=SQL;
+                        Command.Execute();
+                        }
+                    catch (e)
+                        {
+                        Log('files: '+files.item().Name+' - '+e.name+': '+e.message+', '+e.number+': '+e.description);
+                        }
+                    }
+                }
+            catch (e)
+                {
+                Log('IterateFiles: '+e.name+': '+e.message+', '+e.number+': '+e.description);
+                }
+            }
+
+        try 
+            {
+            if (WScript.Arguments.length>0) 
+                {
+                var adCmdText=1;
+                var Connection=new ActiveXObject('ADODB.Connection');
+                Connection.Open('DSN=fileAudit;');
+                Command=new ActiveXObject('ADODB.Command');
+                Command.CommandType=adCmdText;
+                Command.ActiveConnection=Connection;
+                var folderName=WScript.Arguments(0);
+                IterateFiles(folderName);
+                Command=null;
+                Connection.Close();
+                Connection=null;
+                }
+            else
+                {
+                Log('No folder specified');
+                }
+            }
+        catch (e)
+            {
+            Log('main: '+e.name+': '+e.message+', '+e.number+': '+e.description);
+            }
+
+    </script>
+  </job>
+    
+</package>
